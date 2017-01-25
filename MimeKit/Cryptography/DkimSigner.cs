@@ -221,14 +221,47 @@ namespace MimeKit.Cryptography {
 			Domain = domain;
 		}
 
-		/// <summary>
-		/// Gets the private key.
-		/// </summary>
-		/// <remarks>
-		/// The private key used for signing.
-		/// </remarks>
-		/// <value>The private key.</value>
-		public AsymmetricKeyParameter PrivateKey {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MimeKit.Cryptography.DkimSigner"/> class.
+        /// </summary>
+        /// <remarks>
+        /// Creates a new <see cref="DkimSigner"/>.
+        /// </remarks>
+        /// <param name="customSigner">The custom signer to use a different service than BouncyCastle.</param>
+        /// <param name="domain">The domain that the signer represents.</param>
+        /// <param name="selector">The selector subdividing the domain.</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// <para><paramref name="customSigner"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="domain"/> is <c>null</c>.</para>
+        /// <para>-or-</para>
+        /// <para><paramref name="selector"/> is <c>null</c>.</para>
+        /// </exception>
+        public DkimSigner(ISigner customSigner, string domain, string selector)
+	    {
+            if (customSigner == null)
+                throw new ArgumentNullException(nameof(customSigner));
+
+            if (domain == null)
+                throw new ArgumentNullException(nameof(domain));
+
+            if (selector == null)
+                throw new ArgumentNullException(nameof(selector));
+
+            SignatureAlgorithm = DkimSignatureAlgorithm.RsaSha256;
+            CustomSigner = customSigner;
+	        Domain = domain;
+	        Selector = selector;
+	    }
+
+        /// <summary>
+        /// Gets the private key.
+        /// </summary>
+        /// <remarks>
+        /// The private key used for signing.
+        /// </remarks>
+        /// <value>The private key.</value>
+        public AsymmetricKeyParameter PrivateKey {
 			get; private set;
 		}
 
@@ -290,5 +323,16 @@ namespace MimeKit.Cryptography {
 		public string QueryMethod {
 			get; set;
 		}
+
+        /// <summary>
+        /// Gets the custom signer.
+        /// </summary>
+        /// <remarks>
+        /// The custom signer to use a different service than BouncyCastle.
+        /// </remarks>
+        /// <value>
+        /// The custom signer.
+        /// </value>
+        public ISigner CustomSigner { get; private set; }
 	}
 }
